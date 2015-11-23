@@ -15,31 +15,63 @@ const (
 	KeepAlivePeriod = 20 * time.Second
 )
 
-// Interface for ServiceDiscovery client
-// for etcd.
+// RegistryClient is the interface for service
+// discovery based on etcd.
 type RegistryClient interface {
 	// Register given service
 	// to etcd instance
 	Register() error
+
+	// Unregister the service
+	// from etcd.
 	Unregister() error
+
+	// ServiceByName
+	// return the base addresses
+	// for service instances.
 	ServicesByName(name string) ([]string, error)
 }
 
+// EtcdRegistryConfig is configuration structure
+// for connectiong to etcd instance
+// and identify the service.
 type EtcdRegistryConfig struct {
-	EtcdEndpoints   []string
-	ServiceName     string
-	InstanceName    string
-	BaseUrl         string
+	// EtcdEndpoints that service
+	// registry client connects to.
+	EtcdEndpoints []string
+
+	// ServiceName is the
+	// the name of
+	// service in application.
+	ServiceName string
+
+	// InstanceName is the identification
+	// for service instance.
+	InstanceName string
+
+	// BaseUrl is the url
+	// that the service is
+	// acessible on.
+	BaseUrl string
+
 	etcdKey         string
 	keepAliveTicker *time.Ticker
 	cancel          context.CancelFunc
 }
 
+// EtcdReigistryClient  structure implements the
+// basic functionality for service registration
+// in etcd.
+// After the Reguster method is called, the client
+// periodically refreshes the record about the
+// service.
 type EtcdReigistryClient struct {
 	EtcdRegistryConfig
 	etcdKApi client.KeysAPI
 }
 
+// New creates the EtcdRegistryClient
+// with service paramters defined by config.
 func New(config EtcdRegistryConfig) (*EtcdReigistryClient, error) {
 	cfg := client.Config{
 		Endpoints:               config.EtcdEndpoints,
@@ -59,6 +91,11 @@ func New(config EtcdRegistryConfig) (*EtcdReigistryClient, error) {
 	return etcdClient, nil
 }
 
+// Register register service
+// to configured etcd instance.
+// Once the Register is called, the client
+// also periodically
+// calls the refresh goroutine.
 func (e *EtcdReigistryClient) Register() {
 	e.etcdKey = buildKey(e.ServiceName, e.InstanceName)
 	value := registerDTO{
@@ -93,12 +130,18 @@ func (e *EtcdReigistryClient) Register() {
 
 }
 
+// Unregister removes the service instance from
+// etcd. Once the Unregister method is called,
+// the periodicall refresh goroutine is cancelled.
 func (e *EtcdReigistryClient) Unregister() {
 	e.cancel()
 	e.keepAliveTicker.Stop()
 	e.etcdKApi.Delete(context.Background(), e.etcdKey, nil)
 }
 
+// ServicesByName query the
+// etcd instance for service nodes for service
+// by given name.
 func (e *EtcdReigistryClient) ServicesByName(name string) ([]string, error) {
 	response, err := e.etcdKApi.Get(context.Background(), fmt.Sprintf("/%s", name), nil)
 	ipList := make([]string, 0)
