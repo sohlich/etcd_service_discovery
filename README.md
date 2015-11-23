@@ -3,6 +3,8 @@
 This is small library, that wraps the oficial etcd go client, to simplify
 service discovery.
 
+[![GoDoc](https://godoc.org/github.com/sohlich/etcd_service_discovery?status.svg)](https://godoc.org/github.com/sohlich/etcd_service_discovery)
+
 
 ## How to register a service
 
