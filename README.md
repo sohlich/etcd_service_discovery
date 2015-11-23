@@ -10,7 +10,7 @@ service discovery.
 
 ```
 // Create config
-registryConfig := discovery.EtcdRegistryConfig = discovery.EtcdRegistryConfig{
+registryConfig := discovery.EtcdRegistryConfig{
 		EtcdEndpoints: []string{"http://127.0.0.1:4001"}, //etcd instances
 		ServiceName:   "core", //service type/name
 		InstanceName:  "core1", //service instance name
