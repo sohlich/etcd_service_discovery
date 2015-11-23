@@ -27,7 +27,7 @@ func TestBasic(t *testing.T) {
 		EtcdRegistryConfig{
 			ServiceName:  "test",
 			InstanceName: "test1",
-			BaseUrl:      "127.0.0.1:8080",
+			BaseURL:      "127.0.0.1:8080",
 		},
 		kapi,
 	}
@@ -63,7 +63,7 @@ func TestKeepAlive(t *testing.T) {
 		EtcdRegistryConfig{
 			ServiceName:  "test",
 			InstanceName: "test1",
-			BaseUrl:      "127.0.0.1:8080",
+			BaseURL:      "127.0.0.1:8080",
 		},
 		kapi,
 	}

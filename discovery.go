@@ -11,7 +11,13 @@ import (
 )
 
 const (
-	TTL             = 30 * time.Second
+	// TTL is a time to live
+	// for record in etcd
+	TTL = 30 * time.Second
+
+	// KeepAlivePeriod is period of
+	// goroutine to
+	// refresh the record in etcd.
 	KeepAlivePeriod = 20 * time.Second
 )
 
@@ -49,10 +55,10 @@ type EtcdRegistryConfig struct {
 	// for service instance.
 	InstanceName string
 
-	// BaseUrl is the url
+	// BaseURL is the url
 	// that the service is
 	// acessible on.
-	BaseUrl string
+	BaseURL string
 
 	etcdKey         string
 	keepAliveTicker *time.Ticker
@@ -99,7 +105,7 @@ func New(config EtcdRegistryConfig) (*EtcdReigistryClient, error) {
 func (e *EtcdReigistryClient) Register() {
 	e.etcdKey = buildKey(e.ServiceName, e.InstanceName)
 	value := registerDTO{
-		e.BaseUrl,
+		e.BaseURL,
 	}
 
 	val, _ := json.Marshal(value)
@@ -149,14 +155,14 @@ func (e *EtcdReigistryClient) ServicesByName(name string) ([]string, error) {
 		for _, node := range response.Node.Nodes {
 			val := &registerDTO{}
 			json.Unmarshal([]byte(node.Value), val)
-			ipList = append(ipList, val.BaseUrl)
+			ipList = append(ipList, val.BaseURL)
 		}
 	}
 	return ipList, err
 }
 
 type registerDTO struct {
-	BaseUrl string
+	BaseURL string
 }
 
 func buildKey(servicetype, instanceName string) string {
