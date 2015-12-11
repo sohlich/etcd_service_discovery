@@ -143,10 +143,11 @@ func (e *EtcdReigistryClient) Register() error {
 // Unregister removes the service instance from
 // etcd. Once the Unregister method is called,
 // the periodicall refresh goroutine is cancelled.
-func (e *EtcdReigistryClient) Unregister() {
+func (e *EtcdReigistryClient) Unregister() error {
 	e.cancel()
 	e.keepAliveTicker.Stop()
-	e.etcdKApi.Delete(context.Background(), e.etcdKey, nil)
+	_, err := e.etcdKApi.Delete(context.Background(), e.etcdKey, nil)
+	return err
 }
 
 // ServicesByName query the
