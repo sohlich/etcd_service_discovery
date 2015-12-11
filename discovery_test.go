@@ -47,7 +47,7 @@ func TestBasic(t *testing.T) {
 func TestKeepAlive(t *testing.T) {
 
 	cfg := client.Config{
-		Endpoints:               []string{"http://127.0.0.1:4001"},
+		Endpoints:               []string{"http://127.0.0.1:2379"},
 		Transport:               client.DefaultTransport,
 		HeaderTimeoutPerRequest: time.Second,
 	}
@@ -75,4 +75,5 @@ func TestKeepAlive(t *testing.T) {
 	response, _ := client.ServicesByName("test")
 	log.Println(response)
 
+	// Ahoj
 }

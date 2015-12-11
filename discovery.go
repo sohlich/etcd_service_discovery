@@ -102,7 +102,7 @@ func New(config EtcdRegistryConfig) (*EtcdReigistryClient, error) {
 // Once the Register is called, the client
 // also periodically
 // calls the refresh goroutine.
-func (e *EtcdReigistryClient) Register() {
+func (e *EtcdReigistryClient) Register() error {
 	e.etcdKey = buildKey(e.ServiceName, e.InstanceName)
 	value := registerDTO{
 		e.BaseURL,
@@ -113,12 +113,16 @@ func (e *EtcdReigistryClient) Register() {
 	ctx, c := context.WithCancel(context.TODO())
 	e.cancel = c
 
-	insertFunc := func() {
-		e.etcdKApi.Set(context.Background(), e.etcdKey, string(val), &client.SetOptions{
+	insertFunc := func() error {
+		_, err := e.etcdKApi.Set(context.Background(), e.etcdKey, string(val), &client.SetOptions{
 			TTL: TTL,
 		})
+		return err
 	}
-	insertFunc()
+	err := insertFunc()
+	if err != nil {
+		return err
+	}
 
 	// Exec the keep alive goroutine
 	go func() {
@@ -133,7 +137,7 @@ func (e *EtcdReigistryClient) Register() {
 			}
 		}
 	}()
-
+	return nil
 }
 
 // Unregister removes the service instance from
